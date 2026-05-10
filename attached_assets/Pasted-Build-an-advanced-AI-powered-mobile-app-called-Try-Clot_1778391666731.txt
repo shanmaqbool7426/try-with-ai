@@ -1,0 +1,108 @@
+Build an advanced AI-powered mobile app called “Try Clothes on Me” where users can see themselves wearing complete outfits before buying them.
+
+MAIN GOAL:
+The app should allow users to upload their photo and virtually wear full outfits using AI, so they can see exactly how clothes will look on their body before purchasing.
+
+The AI must generate highly realistic results including:
+- shirt
+- pant
+- suit
+- shalwar kameez
+- abaya
+- dupatta
+- hijab
+- shoes
+- coat
+- jewelry
+- full eastern and western outfits
+
+IMPORTANT:
+The AI should properly manage:
+- dupatta placement
+- folding
+- shoulder position
+- cloth physics
+- body fitting
+- sleeves
+- scarf flow
+- realistic fabric texture
+- shadows and lighting
+
+The app should preserve:
+- original face
+- hairstyle
+- body shape
+- skin tone
+- pose
+
+ADVANCED FEATURES:
+
+1. FULL OUTFIT TRY-ON
+- Users can upload:
+  - selfie
+  - full body image
+- Users can upload:
+  - dress image
+  - bridal dress
+  - suit
+  - eastern wear
+  - western wear
+- AI automatically fits the complete outfit on the body
+- Generate front view and side view
+- Ultra realistic results
+
+2. DUPATTA & HIJAB AI SYSTEM
+- AI intelligently places dupatta
+- Natural cloth flow
+- Shoulder wrapping
+- Head covering support
+- Bridal dupatta support
+- Transparent/fancy dupatta texture support
+
+3. AI SIZE & FITTING
+- Detect body size automatically
+- Show loose/tight fitting
+- Smart cloth alignment
+
+4. LIVE CAMERA TRY-ON
+- Real-time virtual outfit preview
+- AR body tracking
+- Outfit follows body movement
+
+5. AI STYLIST
+- Suggest matching:
+  - shoes
+  - bag
+  - jewelry
+  - watch
+  - makeup style
+
+6. SHOPPING INTEGRATION
+- “Buy This Outfit” button
+- Save favorite looks
+- Compare outfits
+
+7. HD AI GENERATION
+- Cinematic fashion photos
+- Studio-quality output
+- Wedding and party themes
+
+UI STYLE:
+- Premium luxury UI
+- Dark modern design
+- Smooth animations
+- Fashion-app aesthetic
+- Instagram + Pinterest inspired
+
+TECH:
+- React Native Expo
+- Node.js
+- MongoDB
+- Python AI services
+- Stable Diffusion XL
+- IDM-VTON
+- CatVTON
+- MediaPipe
+- TensorFlow Lite
+
+The app should feel like a futuristic AI fashion mirror where users can test complete dresses before buying and see exactly how they will look in real life.
