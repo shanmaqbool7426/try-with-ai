@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Try Clothes On Me",
+    "slug": "try-clothes-on-me",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0a0f"
+    },
+    "scheme": "tryclothes",
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Try Clothes On Me to access your photos for virtual try-on.",
+          "cameraPermission": "Allow Try Clothes On Me to access your camera for live AR try-on."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

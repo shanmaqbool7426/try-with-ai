@@ -1,0 +1,132 @@
+Build a FULL advanced AI-powered mobile app called “Try Clothes on Me” using React Native + Expo + Node.js + AI APIs.
+
+CORE IDEA:
+An ultra-modern AI virtual try-on app where users upload their photo and instantly try clothes virtually with realistic AI-generated results.
+
+MAIN FEATURES:
+
+• Upload selfie or full-body image
+• Upload clothing image OR select clothes from catalog
+• AI realistically fits clothes onto the user
+• Preserve face, hairstyle, body shape, and skin tone
+• Generate ultra-realistic outputs with shadows, folds, fabric texture, and proper fitting
+
+ADVANCED FEATURES:
+
+1. AI Virtual Try-On
+- Realistic outfit generation
+- Supports shirts, hoodies, dresses, suits, abayas, jackets, shoes, pants
+- Front and side pose generation
+- HD outputs
+
+2. Live AR Try-On
+- Real-time camera try-on
+- Body tracking
+- Pose detection
+- Clothes move with body
+- Hand and foot tracking
+
+3. AI Fashion Stylist
+- AI chatbot suggesting outfits
+- Color recommendations
+- Body-type matching
+- Trend analysis
+
+4. AI Outfit Generator
+- User types:
+  “Generate luxury black wedding suit”
+- AI creates complete fashion look with matching accessories
+
+5. AI Background Generator
+- Studio
+- Luxury mall
+- Wedding hall
+- Street fashion
+- Beach
+- Rooftop
+
+6. AI Face & Photo Enhancement
+- HD upscale
+- Skin enhancement
+- Cinematic lighting
+- Professional fashion look
+
+7. Video Try-On
+- AI-generated fashion reels
+- Walking animation
+- Catwalk videos
+- Instagram/TikTok style transitions
+
+8. Social Features
+- Post outfits
+- Like/comment/share
+- Follow creators
+- Save looks
+- Explore trending fashion
+
+9. Premium Features
+- Unlimited try-ons
+- 4K exports
+- Video generation
+- Premium outfits
+- Watermark removal
+
+UI/UX REQUIREMENTS:
+- Luxury futuristic dark UI
+- Glassmorphism
+- Smooth animations
+- TikTok-level transitions
+- Pinterest-style fashion feed
+- Highly polished premium experience
+
+TECH STACK:
+Frontend:
+- React Native Expo
+- TypeScript
+- Zustand
+- React Query
+- Reanimated
+
+Backend:
+- Node.js
+- Express
+- MongoDB
+- Redis
+- Socket.io
+
+AI:
+- Python FastAPI
+- PyTorch
+- Stable Diffusion XL
+- IDM-VTON
+- CatVTON
+- MediaPipe
+- TensorFlow Lite
+
+CLOUD:
+- Firebase Auth
+- Cloudinary
+- AWS S3
+- Vercel
+
+REQUIREMENTS:
+- Production-ready architecture
+- Scalable folder structure
+- Clean reusable components
+- Secure authentication
+- Fast image processing
+- Queue system for AI generation
+- Modern responsive UI
+- Optimized performance
+
+DELIVER:
+- Complete mobile app
+- Backend APIs
+- AI microservices
+- Database schema
+- Admin panel
+- Authentication system
+- Beautiful modern UI
+- Fully functional AI try-on pipeline
+
+The app should feel futuristic, cinematic, viral-worthy, premium, and highly addictive like a billion-dollar startup product.
