@@ -1,21 +1,12 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  Share,
-  Dimensions,
+  View, Text, StyleSheet, TouchableOpacity, Image,
+  ScrollView, Share, Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Colors } from '@/constants/Colors';
-import { GlassCard } from '@/components/GlassCard';
-import { GradientButton } from '@/components/GradientButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,65 +14,55 @@ const BG_OPTIONS = [
   { id: 'studio', label: 'Studio', emoji: '🎬' },
   { id: 'mall', label: 'Mall', emoji: '🏬' },
   { id: 'beach', label: 'Beach', emoji: '🏖️' },
+  { id: 'wedding', label: 'Wedding', emoji: '💍' },
   { id: 'street', label: 'Street', emoji: '🌆' },
+  { id: 'rooftop', label: 'Rooftop', emoji: '🌃' },
+];
+
+const AI_SCORES = [
+  { label: 'Fit Accuracy', value: 97, color: '#10b981' },
+  { label: 'Style Match', value: 94, color: '#7c3aed' },
+  { label: 'Color Harmony', value: 91, color: '#06b6d4' },
+  { label: 'Body Preservation', value: 98, color: '#f59e0b' },
 ];
 
 export default function TryOnResultScreen() {
-  const params = useLocalSearchParams<{
-    resultImage: string;
-    clothingName: string;
-    originalPhoto: string;
-  }>();
-
+  const params = useLocalSearchParams<{ resultImage: string; clothingName: string; originalPhoto: string }>();
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [selectedBg, setSelectedBg] = useState('studio');
   const [view, setView] = useState<'result' | 'compare'>('result');
 
-  const resultImage = params.resultImage || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80';
+  const resultImage = params.resultImage || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=90';
   const clothingName = params.clothingName || 'Outfit';
 
   const handleShare = async () => {
     try {
-      await Share.share({
-        message: `Check out my AI virtual try-on with "${clothingName}" on Try Clothes On Me! ✨`,
-        url: resultImage,
-      });
-    } catch (e) {}
+      await Share.share({ message: `Check out my AI try-on with "${clothingName}" on Try Clothes On Me! ✨` });
+    } catch {}
   };
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['rgba(139,92,246,0.2)', 'transparent']}
-        style={styles.bgGrad}
-        pointerEvents="none"
-      />
-
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
-            <Ionicons name="close" size={22} color={Colors.text} />
+          <TouchableOpacity style={styles.headerBtn} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={22} color="#f8fafc" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Your AI Look ✨</Text>
-          <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
-            <Ionicons name="share-social-outline" size={22} color={Colors.text} />
+          <Text style={styles.headerTitle}>Your AI Look</Text>
+          <TouchableOpacity style={styles.headerBtn} onPress={handleShare}>
+            <Ionicons name="share-social-outline" size={22} color="#f8fafc" />
           </TouchableOpacity>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: resultImage }} style={styles.resultImage} resizeMode="cover" />
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+          <View style={styles.imageWrap}>
+            <Image source={{ uri: resultImage }} style={styles.resultImage} />
+            <LinearGradient colors={['transparent', 'rgba(10,10,15,0.7)']} style={styles.imgOverlay} pointerEvents="none" />
 
-            <LinearGradient
-              colors={['transparent', 'rgba(10,10,15,0.8)']}
-              style={styles.imageOverlay}
-              pointerEvents="none"
-            />
-
-            <View style={styles.imageBadges}>
+            <View style={styles.imgBadges}>
               <View style={styles.aiBadge}>
-                <Ionicons name="sparkles" size={12} color="#fff" />
+                <Ionicons name="sparkles" size={11} color="#fff" />
                 <Text style={styles.aiBadgeText}>AI Generated</Text>
               </View>
               <View style={styles.hdBadge}>
@@ -89,30 +70,34 @@ export default function TryOnResultScreen() {
               </View>
             </View>
 
-            <View style={styles.imageActions}>
-              <TouchableOpacity
-                style={[styles.imageAction, liked && styles.imageActionActive]}
-                onPress={() => setLiked(!liked)}
-              >
-                <Ionicons name={liked ? 'heart' : 'heart-outline'} size={22} color={liked ? Colors.accent : '#fff'} />
+            <View style={styles.imgSideActions}>
+              <TouchableOpacity style={[styles.sideActionBtn, liked && styles.sideActionBtnLiked]} onPress={() => setLiked(!liked)}>
+                <Ionicons name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? '#ec4899' : '#fff'} />
+                <Text style={styles.sideActionTxt}>Like</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.imageAction, saved && styles.imageActionSaved]}
-                onPress={() => setSaved(!saved)}
-              >
-                <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={22} color={saved ? Colors.primary : '#fff'} />
+              <TouchableOpacity style={[styles.sideActionBtn, saved && styles.sideActionBtnSaved]} onPress={() => setSaved(!saved)}>
+                <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={24} color={saved ? '#7c3aed' : '#fff'} />
+                <Text style={styles.sideActionTxt}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.sideActionBtn} onPress={handleShare}>
+                <Ionicons name="paper-plane-outline" size={22} color="#fff" />
+                <Text style={styles.sideActionTxt}>Share</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.clothingInfo}>
-            <Text style={styles.clothingName}>{clothingName}</Text>
-            <View style={styles.ratingRow}>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Ionicons key={i} name="star" size={14} color={Colors.gold} />
-              ))}
-              <Text style={styles.ratingText}>AI Quality Score: 9.8/10</Text>
+          <View style={styles.infoRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.clothingName}>{clothingName}</Text>
+              <View style={styles.ratingRow}>
+                {[1,2,3,4,5].map(i => <Ionicons key={i} name="star" size={13} color="#f59e0b" />)}
+                <Text style={styles.ratingTxt}>AI Score: 9.7/10</Text>
+              </View>
             </View>
+            <TouchableOpacity style={styles.tryAgainBtn} onPress={() => router.back()}>
+              <Ionicons name="refresh" size={16} color="#a78bfa" />
+              <Text style={styles.tryAgainTxt}>Retry</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.viewToggle}>
@@ -122,13 +107,11 @@ export default function TryOnResultScreen() {
                 style={[styles.viewBtn, view === v && styles.viewBtnActive]}
                 onPress={() => setView(v as any)}
               >
-                {view === v ? (
-                  <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.viewBtnGrad}>
-                    <Text style={styles.viewBtnTextActive}>{v === 'result' ? 'AI Result' : 'Before/After'}</Text>
-                  </LinearGradient>
-                ) : (
-                  <Text style={styles.viewBtnText}>{v === 'result' ? 'AI Result' : 'Before/After'}</Text>
-                )}
+                {view === v
+                  ? <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.viewBtnGrad}>
+                      <Text style={styles.viewBtnTxtActive}>{v === 'result' ? 'AI Result' : 'Before / After'}</Text>
+                    </LinearGradient>
+                  : <Text style={styles.viewBtnTxt}>{v === 'result' ? 'AI Result' : 'Before / After'}</Text>}
               </TouchableOpacity>
             ))}
           </View>
@@ -136,92 +119,84 @@ export default function TryOnResultScreen() {
           {view === 'compare' && params.originalPhoto && (
             <View style={styles.compareRow}>
               <View style={styles.compareItem}>
-                <Image source={{ uri: params.originalPhoto }} style={styles.compareImage} />
+                <Image source={{ uri: params.originalPhoto }} style={styles.compareImg} />
                 <View style={styles.compareLabel}>
-                  <Text style={styles.compareLabelText}>Before</Text>
+                  <Text style={styles.compareLabelTxt}>Original</Text>
                 </View>
               </View>
               <View style={styles.compareArrow}>
-                <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.compareArrowGrad}>
-                  <Ionicons name="arrow-forward" size={18} color="#fff" />
+                <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.compareArrowGrad}>
+                  <Ionicons name="arrow-forward" size={16} color="#fff" />
                 </LinearGradient>
               </View>
               <View style={styles.compareItem}>
-                <Image source={{ uri: resultImage }} style={styles.compareImage} />
-                <View style={[styles.compareLabel, { backgroundColor: Colors.primary }]}>
-                  <Text style={styles.compareLabelText}>After AI</Text>
+                <Image source={{ uri: resultImage }} style={styles.compareImg} />
+                <View style={[styles.compareLabel, { backgroundColor: '#7c3aed' }]}>
+                  <Text style={styles.compareLabelTxt}>AI Try-On</Text>
                 </View>
               </View>
             </View>
           )}
 
           <View style={styles.bgSection}>
-            <Text style={styles.sectionTitle}>Change Background</Text>
-            <View style={styles.bgOptions}>
+            <Text style={styles.sectionLabel}>Change Background</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.bgRow}>
               {BG_OPTIONS.map((bg) => (
                 <TouchableOpacity
                   key={bg.id}
-                  style={[styles.bgOption, selectedBg === bg.id && styles.bgOptionActive]}
+                  style={[styles.bgChip, selectedBg === bg.id && styles.bgChipActive]}
                   onPress={() => setSelectedBg(bg.id)}
                 >
                   <Text style={styles.bgEmoji}>{bg.emoji}</Text>
-                  <Text style={[styles.bgLabel, selectedBg === bg.id && { color: Colors.primaryLight }]}>
-                    {bg.label}
-                  </Text>
+                  <Text style={[styles.bgLabel, selectedBg === bg.id && { color: '#a78bfa' }]}>{bg.label}</Text>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
           </View>
 
-          <GlassCard style={styles.statsCard}>
-            <Text style={styles.statsTitle}>AI Analysis</Text>
-            <View style={styles.statsList}>
-              {[
-                { label: 'Fit Score', value: '97%', color: Colors.success },
-                { label: 'Style Match', value: '94%', color: Colors.primary },
-                { label: 'Color Harmony', value: '91%', color: Colors.cyan },
-                { label: 'Body Shape Fit', value: '98%', color: Colors.gold },
-              ].map((stat, i) => (
-                <View key={i} style={styles.statRow}>
-                  <Text style={styles.statLabel}>{stat.label}</Text>
-                  <View style={styles.statBar}>
-                    <LinearGradient
-                      colors={[stat.color, `${stat.color}80`]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={[styles.statBarFill, { width: stat.value }]}
-                    />
-                  </View>
-                  <Text style={[styles.statValue, { color: stat.color }]}>{stat.value}</Text>
+          <View style={styles.scoresCard}>
+            <Text style={styles.sectionLabel}>AI Analysis</Text>
+            {AI_SCORES.map((score, i) => (
+              <View key={i} style={styles.scoreRow}>
+                <Text style={styles.scoreLabel}>{score.label}</Text>
+                <View style={styles.scoreBg}>
+                  <LinearGradient
+                    colors={[score.color, `${score.color}80`]}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    style={[styles.scoreFill, { width: `${score.value}%` as any }]}
+                  />
                 </View>
-              ))}
-            </View>
-          </GlassCard>
+                <Text style={[styles.scoreVal, { color: score.color }]}>{score.value}%</Text>
+              </View>
+            ))}
+          </View>
 
-          <View style={styles.actionsSection}>
-            <GradientButton
-              title="Post to Feed 🔥"
-              onPress={() => router.back()}
-              size="lg"
-            />
-            <View style={styles.secondaryActions}>
-              <TouchableOpacity style={styles.secondaryBtn} onPress={handleShare}>
-                <GlassCard style={styles.secondaryBtnInner}>
-                  <Ionicons name="share-social" size={20} color={Colors.primary} />
-                  <Text style={styles.secondaryBtnText}>Share</Text>
-                </GlassCard>
+          <View style={styles.ctaSection}>
+            <TouchableOpacity style={styles.postBtn} activeOpacity={0.9}>
+              <LinearGradient colors={['#7c3aed', '#ec4899']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.postBtnGrad}>
+                <Ionicons name="share-social" size={18} color="#fff" />
+                <Text style={styles.postBtnTxt}>Post to Feed</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <View style={styles.secondaryRow}>
+              <TouchableOpacity style={styles.secBtn} onPress={handleShare}>
+                <View style={styles.secBtnInner}>
+                  <Ionicons name="share-outline" size={20} color="#7c3aed" />
+                  <Text style={styles.secBtnTxt}>Share</Text>
+                </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.secondaryBtn}>
-                <GlassCard style={styles.secondaryBtnInner}>
-                  <Ionicons name="download" size={20} color={Colors.cyan} />
-                  <Text style={[styles.secondaryBtnText, { color: Colors.cyan }]}>Save HD</Text>
-                </GlassCard>
+              <TouchableOpacity style={styles.secBtn}>
+                <View style={styles.secBtnInner}>
+                  <Ionicons name="download-outline" size={20} color="#06b6d4" />
+                  <Text style={[styles.secBtnTxt, { color: '#06b6d4' }]}>Save HD</Text>
+                </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.back()}>
-                <GlassCard style={styles.secondaryBtnInner}>
-                  <Ionicons name="refresh" size={20} color={Colors.textSecondary} />
-                  <Text style={styles.secondaryBtnText}>Retry</Text>
-                </GlassCard>
+              <TouchableOpacity style={styles.secBtn} onPress={() => router.push('/screens/outfit-generator')}>
+                <View style={styles.secBtnInner}>
+                  <Ionicons name="sparkles-outline" size={20} color="#f59e0b" />
+                  <Text style={[styles.secBtnTxt, { color: '#f59e0b' }]}>Generate</Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
@@ -232,129 +207,94 @@ export default function TryOnResultScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1, backgroundColor: '#0a0a0f' },
   safeArea: { flex: 1 },
-  bgGrad: { position: 'absolute', top: 0, left: 0, right: 0, height: 300 },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 18, paddingVertical: 12,
   },
-  closeBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  headerBtn: {
+    width: 42, height: 42, borderRadius: 13,
+    backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center',
   },
-  headerTitle: { color: Colors.text, fontSize: 18, fontWeight: '800' },
-  shareBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scrollContent: { paddingBottom: 60 },
-  imageContainer: { position: 'relative', marginHorizontal: 16, borderRadius: 24, overflow: 'hidden' },
-  resultImage: { width: '100%', height: 420, resizeMode: 'cover' },
-  imageOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 120 },
-  imageBadges: { position: 'absolute', top: 12, left: 12, flexDirection: 'row', gap: 8 },
+  headerTitle: { color: '#f8fafc', fontSize: 18, fontWeight: '800' },
+  scroll: { paddingBottom: 60 },
+  imageWrap: { position: 'relative', marginHorizontal: 16, borderRadius: 24, overflow: 'hidden', marginBottom: 16 },
+  resultImage: { width: '100%', height: height * 0.52 },
+  imgOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 120 },
+  imgBadges: { position: 'absolute', top: 14, left: 14, flexDirection: 'row', gap: 8 },
   aiBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(139,92,246,0.8)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: 'rgba(124,58,237,0.85)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
   },
   aiBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
-  hdBadge: {
-    backgroundColor: 'rgba(245,158,11,0.8)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
+  hdBadge: { backgroundColor: 'rgba(245,158,11,0.85)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 },
   hdBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
-  imageActions: {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    gap: 10,
+  imgSideActions: { position: 'absolute', bottom: 16, right: 14, gap: 14 },
+  sideActionBtn: {
+    alignItems: 'center', width: 46, height: 54,
+    backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 16, justifyContent: 'center',
   },
-  imageAction: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  sideActionBtnLiked: { backgroundColor: 'rgba(236,72,153,0.25)' },
+  sideActionBtnSaved: { backgroundColor: 'rgba(124,58,237,0.25)' },
+  sideActionTxt: { color: '#fff', fontSize: 10, fontWeight: '600', marginTop: 3 },
+  infoRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, marginBottom: 16 },
+  clothingName: { color: '#f8fafc', fontSize: 20, fontWeight: '800' },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 5 },
+  ratingTxt: { color: '#64748b', fontSize: 12, marginLeft: 6 },
+  tryAgainBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: 'rgba(124,58,237,0.12)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14,
+    borderWidth: 1, borderColor: 'rgba(124,58,237,0.25)',
   },
-  imageActionActive: { backgroundColor: 'rgba(236,72,153,0.3)' },
-  imageActionSaved: { backgroundColor: 'rgba(139,92,246,0.3)' },
-  clothingInfo: { paddingHorizontal: 20, paddingVertical: 14 },
-  clothingName: { color: Colors.text, fontSize: 22, fontWeight: '800' },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
-  ratingText: { color: Colors.textSecondary, fontSize: 12, marginLeft: 6 },
+  tryAgainTxt: { color: '#a78bfa', fontWeight: '700', fontSize: 13 },
   viewToggle: {
-    flexDirection: 'row',
-    marginHorizontal: 16,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: 14,
-    padding: 4,
-    marginBottom: 16,
+    flexDirection: 'row', marginHorizontal: 16, backgroundColor: '#16161f',
+    borderRadius: 14, padding: 4, marginBottom: 16,
   },
-  viewBtn: { flex: 1, borderRadius: 10, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
+  viewBtn: { flex: 1, borderRadius: 10, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', paddingVertical: 9 },
   viewBtnActive: { padding: 0 },
-  viewBtnGrad: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
-  viewBtnText: { color: Colors.textSecondary, fontSize: 13, fontWeight: '600' },
-  viewBtnTextActive: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  viewBtnGrad: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', paddingVertical: 9 },
+  viewBtnTxt: { color: '#64748b', fontSize: 13, fontWeight: '600' },
+  viewBtnTxtActive: { color: '#fff', fontSize: 13, fontWeight: '700' },
   compareRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 10, marginBottom: 16 },
   compareItem: { flex: 1, position: 'relative' },
-  compareImage: { width: '100%', height: 200, borderRadius: 16, resizeMode: 'cover' },
+  compareImg: { width: '100%', height: 200, borderRadius: 16 },
   compareArrow: { width: 36, height: 36, borderRadius: 18, overflow: 'hidden' },
   compareArrowGrad: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   compareLabel: {
-    position: 'absolute',
-    bottom: 8,
-    left: 8,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
+    position: 'absolute', bottom: 8, left: 8,
+    backgroundColor: 'rgba(0,0,0,0.65)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8,
   },
-  compareLabelText: { color: '#fff', fontSize: 11, fontWeight: '700' },
-  bgSection: { paddingHorizontal: 16, marginBottom: 16 },
-  sectionTitle: { color: Colors.text, fontSize: 16, fontWeight: '700', marginBottom: 12 },
-  bgOptions: { flexDirection: 'row', gap: 10 },
-  bgOption: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: 12,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: Colors.border,
+  compareLabelTxt: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  bgSection: { paddingHorizontal: 16, marginBottom: 20 },
+  sectionLabel: { color: '#f8fafc', fontSize: 16, fontWeight: '700', marginBottom: 12 },
+  bgRow: { gap: 8 },
+  bgChip: {
+    alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14,
+    backgroundColor: '#16161f', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
-  bgOptionActive: { borderColor: Colors.primary, backgroundColor: 'rgba(139,92,246,0.12)' },
+  bgChipActive: { borderColor: '#7c3aed', backgroundColor: 'rgba(124,58,237,0.12)' },
   bgEmoji: { fontSize: 20, marginBottom: 4 },
-  bgLabel: { color: Colors.textSecondary, fontSize: 11, fontWeight: '600' },
-  statsCard: { marginHorizontal: 16, padding: 16, marginBottom: 20 },
-  statsTitle: { color: Colors.text, fontWeight: '700', marginBottom: 14 },
-  statsList: { gap: 12 },
-  statRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  statLabel: { color: Colors.textSecondary, fontSize: 13, width: 110 },
-  statBar: { flex: 1, height: 6, backgroundColor: Colors.surfaceElevated, borderRadius: 3, overflow: 'hidden' },
-  statBarFill: { height: '100%', borderRadius: 3 },
-  statValue: { fontSize: 13, fontWeight: '700', width: 40, textAlign: 'right' },
-  actionsSection: { paddingHorizontal: 16, gap: 12 },
-  secondaryActions: { flexDirection: 'row', gap: 10 },
-  secondaryBtn: { flex: 1 },
-  secondaryBtnInner: { padding: 12, alignItems: 'center', gap: 4 },
-  secondaryBtnText: { color: Colors.textSecondary, fontSize: 12, fontWeight: '600' },
+  bgLabel: { color: '#64748b', fontSize: 11, fontWeight: '600' },
+  scoresCard: {
+    marginHorizontal: 16, backgroundColor: '#12121a', borderRadius: 20,
+    padding: 18, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+  },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  scoreLabel: { color: '#94a3b8', fontSize: 13, width: 130 },
+  scoreBg: { flex: 1, height: 7, backgroundColor: '#1a1a28', borderRadius: 4, overflow: 'hidden' },
+  scoreFill: { height: '100%', borderRadius: 4 },
+  scoreVal: { fontSize: 13, fontWeight: '800', width: 38, textAlign: 'right' },
+  ctaSection: { paddingHorizontal: 16, gap: 12 },
+  postBtn: { borderRadius: 18, overflow: 'hidden' },
+  postBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingVertical: 17 },
+  postBtnTxt: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  secondaryRow: { flexDirection: 'row', gap: 10 },
+  secBtn: { flex: 1, borderRadius: 14, overflow: 'hidden' },
+  secBtnInner: {
+    backgroundColor: '#12121a', padding: 13, alignItems: 'center', gap: 5,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', borderRadius: 14,
+  },
+  secBtnTxt: { color: '#64748b', fontSize: 12, fontWeight: '600' },
 });

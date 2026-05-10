@@ -8,7 +8,6 @@ import {
   Image,
   Alert,
   Dimensions,
-  Platform,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,91 +16,40 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
-import { GlassCard } from '@/components/GlassCard';
-import { GradientButton } from '@/components/GradientButton';
 import { useAppStore } from '@/store/useAppStore';
 
 const { width } = Dimensions.get('window');
 
-const STYLE_OPTIONS = [
-  { id: 'casual', label: 'Casual', icon: '👕' },
-  { id: 'formal', label: 'Formal', icon: '👔' },
-  { id: 'luxury', label: 'Luxury', icon: '💎' },
-  { id: 'sport', label: 'Sport', icon: '🏃' },
-  { id: 'street', label: 'Street', icon: '🧢' },
-  { id: 'bohemian', label: 'Boho', icon: '🌸' },
-];
-
 const CLOTHING_CATALOG = [
-  {
-    id: '1',
-    name: 'Black Blazer',
-    category: 'Formal',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80',
-    price: '$129',
-  },
-  {
-    id: '2',
-    name: 'White Linen Dress',
-    category: 'Casual',
-    image: 'https://images.unsplash.com/photo-1495385794356-15371f348c31?w=300&q=80',
-    price: '$89',
-  },
-  {
-    id: '3',
-    name: 'Luxury Evening Gown',
-    category: 'Luxury',
-    image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=300&q=80',
-    price: '$349',
-  },
-  {
-    id: '4',
-    name: 'Navy Suit',
-    category: 'Formal',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80',
-    price: '$249',
-  },
-  {
-    id: '5',
-    name: 'Floral Sundress',
-    category: 'Casual',
-    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&q=80',
-    price: '$75',
-  },
-  {
-    id: '6',
-    name: 'Leather Jacket',
-    category: 'Street',
-    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300&q=80',
-    price: '$199',
-  },
+  { id: '1', name: 'Luxury Blazer', category: 'Formal', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80', price: '$129' },
+  { id: '2', name: 'White Dress', category: 'Casual', image: 'https://images.unsplash.com/photo-1495385794356-15371f348c31?w=300&q=80', price: '$89' },
+  { id: '3', name: 'Evening Gown', category: 'Luxury', image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=300&q=80', price: '$349' },
+  { id: '4', name: 'Navy Suit', category: 'Formal', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80', price: '$249' },
+  { id: '5', name: 'Floral Sundress', category: 'Casual', image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&q=80', price: '$75' },
+  { id: '6', name: 'Leather Jacket', category: 'Street', image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300&q=80', price: '$199' },
+  { id: '7', name: 'Bridal Wear', category: 'Wedding', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=300&q=80', price: '$599' },
+  { id: '8', name: 'Shalwar Kameez', category: 'Eastern', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=300&q=80', price: '$119' },
 ];
 
-const BG_OPTIONS = [
-  { id: 'studio', label: 'Studio', icon: '🎬' },
-  { id: 'mall', label: 'Luxury Mall', icon: '🏬' },
-  { id: 'wedding', label: 'Wedding', icon: '💍' },
-  { id: 'street', label: 'Street', icon: '🌆' },
-  { id: 'beach', label: 'Beach', icon: '🏖️' },
-  { id: 'rooftop', label: 'Rooftop', icon: '🌃' },
-];
+const CATEGORIES_FILTER = ['All', 'Formal', 'Casual', 'Luxury', 'Street', 'Eastern', 'Wedding'];
 
-type Step = 'upload' | 'clothing' | 'settings' | 'processing';
+type Step = 'upload' | 'clothing' | 'processing';
 
 export default function TryOnScreen() {
-  const { isProcessing, setProcessing, addTryOnResult, selectedStyle, setSelectedStyle, backgroundStyle, setBackgroundStyle } = useAppStore();
+  const { setProcessing, addTryOnResult } = useAppStore();
   const [step, setStep] = useState<Step>('upload');
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
-  const [selectedClothing, setSelectedClothing] = useState<string | null>(null);
   const [selectedClothingId, setSelectedClothingId] = useState<string | null>(null);
+  const [selectedClothing, setSelectedClothing] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [progressMsg, setProgressMsg] = useState('');
+  const [catFilter, setCatFilter] = useState('All');
 
   const pickUserPhoto = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Please allow access to your photos to use this feature.');
+        Alert.alert('Permission needed', 'Please allow photo access to use try-on.');
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -114,14 +62,9 @@ export default function TryOnScreen() {
         setUserPhoto(result.assets[0].uri);
         setStep('clothing');
       }
-    } catch (err) {
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
+    } catch {
+      Alert.alert('Error', 'Failed to pick image.');
     }
-  };
-
-  const selectCatalogItem = (item: any) => {
-    setSelectedClothing(item.image);
-    setSelectedClothingId(item.id);
   };
 
   const pickClothingPhoto = async () => {
@@ -135,9 +78,7 @@ export default function TryOnScreen() {
         setSelectedClothing(result.assets[0].uri);
         setSelectedClothingId('custom');
       }
-    } catch (err) {
-      Alert.alert('Error', 'Failed to pick clothing image.');
-    }
+    } catch {}
   };
 
   const startTryOn = async () => {
@@ -147,35 +88,36 @@ export default function TryOnScreen() {
     setProcessing(true);
 
     const steps = [
-      { msg: 'Analyzing your body shape...', pct: 15 },
-      { msg: 'Detecting pose & proportions...', pct: 30 },
-      { msg: 'Fitting clothing realistically...', pct: 55 },
-      { msg: 'Adding fabric texture & shadows...', pct: 75 },
-      { msg: 'Enhancing lighting & details...', pct: 90 },
-      { msg: 'Finalizing HD output...', pct: 100 },
+      { msg: 'Analyzing body shape & pose...', pct: 20 },
+      { msg: 'Detecting proportions...', pct: 40 },
+      { msg: 'Fitting clothing realistically...', pct: 60 },
+      { msg: 'Adding fabric texture & shadows...', pct: 80 },
+      { msg: 'Rendering HD output...', pct: 100 },
     ];
-
     for (const s of steps) {
       setProgressMsg(s.msg);
-      await new Promise((r) => setTimeout(r, 700));
+      await new Promise((r) => setTimeout(r, 750));
       setProgress(s.pct);
     }
+    await new Promise((r) => setTimeout(r, 400));
 
-    await new Promise((r) => setTimeout(r, 500));
-
-    const mockResultImages = [
-      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80',
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80',
-      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80',
+    const mockResults = [
+      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=90',
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=90',
+      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=90',
     ];
+
+    const clothingName = selectedClothingId === 'custom'
+      ? 'Custom Upload'
+      : CLOTHING_CATALOG.find(c => c.id === selectedClothingId)?.name || 'Outfit';
 
     const result = {
       id: Date.now().toString(),
       originalPhoto: userPhoto,
       clothingImage: selectedClothing,
-      resultImage: mockResultImages[Math.floor(Math.random() * mockResultImages.length)],
+      resultImage: mockResults[Math.floor(Math.random() * mockResults.length)],
       timestamp: Date.now(),
-      clothingName: selectedClothingId === 'custom' ? 'Custom Upload' : CLOTHING_CATALOG.find(c => c.id === selectedClothingId)?.name || 'Outfit',
+      clothingName,
       liked: false,
     };
 
@@ -184,11 +126,7 @@ export default function TryOnScreen() {
 
     router.push({
       pathname: '/screens/tryon-result',
-      params: {
-        resultImage: result.resultImage,
-        clothingName: result.clothingName,
-        originalPhoto: userPhoto,
-      },
+      params: { resultImage: result.resultImage, clothingName, originalPhoto: userPhoto },
     });
 
     setTimeout(() => {
@@ -200,44 +138,49 @@ export default function TryOnScreen() {
     }, 300);
   };
 
+  const filteredCatalog = catFilter === 'All'
+    ? CLOTHING_CATALOG
+    : CLOTHING_CATALOG.filter(c => c.category === catFilter);
+
   if (step === 'processing') {
     return (
       <View style={styles.container}>
-        <LinearGradient colors={['rgba(139,92,246,0.15)', 'rgba(236,72,153,0.1)', 'transparent']} style={styles.bgGrad} pointerEvents="none" />
+        <LinearGradient colors={['#1a0a2e', '#0d0d1f', '#0a0a0f']} style={StyleSheet.absoluteFill} />
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.processingContainer}>
+          <View style={styles.processingWrap}>
             <View style={styles.processingOrb}>
-              <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.orbGrad}>
-                <Ionicons name="shirt" size={48} color="#fff" />
+              <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.orbInner}>
+                <Ionicons name="shirt" size={44} color="#fff" />
               </LinearGradient>
+              <View style={styles.orbRing1} />
+              <View style={styles.orbRing2} />
             </View>
-
-            <Text style={styles.processingTitle}>AI Magic in Progress</Text>
+            <Text style={styles.processingTitle}>AI Magic Happening</Text>
             <Text style={styles.processingMsg}>{progressMsg}</Text>
-
-            <View style={styles.progressBarContainer}>
-              <View style={styles.progressBarBg}>
+            <View style={styles.progressWrap}>
+              <View style={styles.progressBg}>
                 <LinearGradient
-                  colors={['#8b5cf6', '#ec4899']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={[styles.progressBarFill, { width: `${progress}%` }]}
+                  colors={['#7c3aed', '#ec4899']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={[styles.progressFill, { width: `${progress}%` as any }]}
                 />
               </View>
               <Text style={styles.progressPct}>{progress}%</Text>
             </View>
-
             <View style={styles.processingSteps}>
-              {['Body Analysis', 'AI Fitting', 'HD Rendering'].map((s, i) => (
-                <View key={i} style={[styles.processingStep, progress > i * 33 && styles.processingStepDone]}>
-                  <Ionicons
-                    name={progress > i * 33 ? 'checkmark-circle' : 'ellipse-outline'}
-                    size={18}
-                    color={progress > i * 33 ? Colors.success : Colors.textMuted}
-                  />
-                  <Text style={[styles.processingStepText, progress > i * 33 && { color: Colors.success }]}>{s}</Text>
-                </View>
-              ))}
+              {['Body Analysis', 'AI Fitting', 'HD Render'].map((s, i) => {
+                const done = progress > i * 33;
+                return (
+                  <View key={i} style={styles.pStep}>
+                    <View style={[styles.pStepDot, done && styles.pStepDotDone]}>
+                      {done
+                        ? <Ionicons name="checkmark" size={12} color="#fff" />
+                        : <View style={styles.pStepInner} />}
+                    </View>
+                    <Text style={[styles.pStepText, done && { color: '#10b981' }]}>{s}</Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
         </SafeAreaView>
@@ -247,242 +190,195 @@ export default function TryOnScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['rgba(139,92,246,0.1)', 'transparent']} style={styles.bgGrad} pointerEvents="none" />
+      <LinearGradient colors={['rgba(124,58,237,0.12)', 'transparent']} style={styles.bgGrad} pointerEvents="none" />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
+
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>AI Virtual Try-On</Text>
-          <Text style={styles.headerSub}>Powered by advanced AI models</Text>
+          <View>
+            <Text style={styles.headerTitle}>Virtual Try-On</Text>
+            <Text style={styles.headerSub}>See yourself in any outfit instantly</Text>
+          </View>
+          <TouchableOpacity style={styles.arBtn} onPress={() => router.push('/screens/ar-tryon')}>
+            <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.arBtnGrad}>
+              <Ionicons name="videocam" size={16} color="#fff" />
+              <Text style={styles.arBtnText}>LIVE AR</Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.stepIndicator}>
-          {['Upload', 'Clothing', 'Settings'].map((s, i) => {
-            const stepIndex = ['upload', 'clothing', 'settings'].indexOf(step);
-            const isActive = i === stepIndex;
-            const isDone = i < stepIndex;
+        <View style={styles.stepBar}>
+          {['Your Photo', 'Pick Outfit', 'Generate'].map((label, i) => {
+            const stepIdx = step === 'upload' ? 0 : step === 'clothing' ? 1 : 2;
+            const active = i === stepIdx;
+            const done = i < stepIdx;
             return (
               <React.Fragment key={i}>
                 <View style={styles.stepItem}>
-                  <View style={[styles.stepCircle, isActive && styles.stepCircleActive, isDone && styles.stepCircleDone]}>
-                    {isDone ? (
-                      <Ionicons name="checkmark" size={14} color="#fff" />
-                    ) : (
-                      <Text style={[styles.stepNum, isActive && { color: '#fff' }]}>{i + 1}</Text>
-                    )}
+                  <View style={[styles.stepCircle, active && styles.stepCircleActive, done && styles.stepCircleDone]}>
+                    {done
+                      ? <Ionicons name="checkmark" size={13} color="#fff" />
+                      : <Text style={[styles.stepNum, active && { color: '#fff' }]}>{i + 1}</Text>}
                   </View>
-                  <Text style={[styles.stepLabel, isActive && { color: Colors.primaryLight }]}>{s}</Text>
+                  <Text style={[styles.stepLabel, active && { color: '#a78bfa' }, done && { color: '#10b981' }]}>{label}</Text>
                 </View>
-                {i < 2 && <View style={[styles.stepLine, isDone && styles.stepLineDone]} />}
+                {i < 2 && <View style={[styles.stepLine, done && styles.stepLineDone]} />}
               </React.Fragment>
             );
           })}
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
           {step === 'upload' && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Upload Your Photo</Text>
-              <Text style={styles.sectionSub}>Full-body or upper-body photo works best</Text>
-
-              <TouchableOpacity
-                style={styles.uploadArea}
-                onPress={pickUserPhoto}
-                activeOpacity={0.85}
-              >
+              <TouchableOpacity style={styles.uploadBox} onPress={pickUserPhoto} activeOpacity={0.85}>
                 <LinearGradient
-                  colors={['rgba(139,92,246,0.08)', 'rgba(236,72,153,0.05)']}
-                  style={styles.uploadGrad}
+                  colors={['rgba(124,58,237,0.1)', 'rgba(236,72,153,0.06)']}
+                  style={styles.uploadBoxInner}
                 >
-                  <View style={styles.uploadIcon}>
-                    <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.uploadIconGrad}>
-                      <Ionicons name="person-add" size={32} color="#fff" />
-                    </LinearGradient>
-                  </View>
-                  <Text style={styles.uploadTitle}>Tap to Upload Photo</Text>
-                  <Text style={styles.uploadSub}>JPG, PNG • Recommended: full body shot</Text>
-
+                  <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.uploadIcon}>
+                    <Ionicons name="person-add" size={30} color="#fff" />
+                  </LinearGradient>
+                  <Text style={styles.uploadTitle}>Upload Your Photo</Text>
+                  <Text style={styles.uploadSub}>Full body photo works best for accurate results</Text>
                   <View style={styles.uploadTips}>
-                    {['Good lighting', 'Clear background', 'Front-facing'].map((tip, i) => (
+                    {['Good lighting', 'Clear background', 'Front facing'].map((tip, i) => (
                       <View key={i} style={styles.uploadTip}>
-                        <Ionicons name="checkmark-circle" size={14} color={Colors.success} />
+                        <Ionicons name="checkmark-circle" size={13} color="#10b981" />
                         <Text style={styles.uploadTipText}>{tip}</Text>
                       </View>
                     ))}
                   </View>
+                  <View style={styles.uploadBtn}>
+                    <Text style={styles.uploadBtnText}>Choose Photo</Text>
+                  </View>
                 </LinearGradient>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.cameraBtn}
-                onPress={() => router.push('/screens/ar-tryon')}
-                activeOpacity={0.85}
-              >
-                <GlassCard style={styles.cameraBtnInner} glow>
-                  <Ionicons name="videocam" size={22} color={Colors.primary} />
-                  <Text style={styles.cameraBtnText}>Live AR Try-On</Text>
-                  <Text style={styles.cameraBtnSub}>Real-time camera • Body tracking</Text>
-                  <View style={styles.liveChip}>
-                    <View style={styles.liveDot} />
-                    <Text style={styles.liveText}>LIVE</Text>
+              <View style={styles.dividerRow}>
+                <View style={styles.divider} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.divider} />
+              </View>
+
+              <TouchableOpacity style={styles.liveArCard} onPress={() => router.push('/screens/ar-tryon')} activeOpacity={0.85}>
+                <View style={styles.liveArLeft}>
+                  <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.liveArIcon}>
+                    <Ionicons name="videocam" size={20} color="#fff" />
+                  </LinearGradient>
+                  <View>
+                    <Text style={styles.liveArTitle}>Live AR Try-On</Text>
+                    <Text style={styles.liveArSub}>Real-time camera • Body tracking</Text>
                   </View>
-                </GlassCard>
+                </View>
+                <View style={styles.liveBadge}>
+                  <View style={styles.liveDot} />
+                  <Text style={styles.liveText}>LIVE</Text>
+                </View>
               </TouchableOpacity>
+
+              <View style={styles.clothingTypesSection}>
+                <Text style={styles.clothingTypesTitle}>Supports All Clothing Types</Text>
+                <View style={styles.clothingTypeGrid}>
+                  {[
+                    { icon: '👔', label: 'Shirts & Suits' },
+                    { icon: '👗', label: 'Dresses' },
+                    { icon: '🥻', label: 'Shalwar Kameez' },
+                    { icon: '🧕', label: 'Hijab & Abaya' },
+                    { icon: '👠', label: 'Shoes' },
+                    { icon: '💍', label: 'Jewelry' },
+                    { icon: '🧥', label: 'Coats' },
+                    { icon: '👰', label: 'Bridal Wear' },
+                  ].map((item, i) => (
+                    <View key={i} style={styles.clothingTypeItem}>
+                      <Text style={styles.clothingTypeEmoji}>{item.icon}</Text>
+                      <Text style={styles.clothingTypeLabel}>{item.label}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
             </View>
           )}
 
           {step === 'clothing' && (
             <View style={styles.section}>
-              {userPhoto && (
-                <View style={styles.userPhotoPreview}>
-                  <Image source={{ uri: userPhoto }} style={styles.userPhotoSmall} />
-                  <View>
-                    <Text style={styles.userPhotoLabel}>Your Photo</Text>
-                    <TouchableOpacity onPress={() => setStep('upload')}>
-                      <Text style={styles.changePhotoBtn}>Change Photo</Text>
-                    </TouchableOpacity>
-                  </View>
+              <View style={styles.photoPreviewBar}>
+                <Image source={{ uri: userPhoto! }} style={styles.photoThumb} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.photoPreviewLabel}>Your photo selected</Text>
+                  <Text style={styles.photoPreviewSub}>Now pick an outfit to try on</Text>
                 </View>
-              )}
-
-              <Text style={styles.sectionTitle}>Choose Clothing</Text>
-              <Text style={styles.sectionSub}>Select from catalog or upload your own</Text>
+                <TouchableOpacity onPress={() => setStep('upload')}>
+                  <Text style={styles.changeBtn}>Change</Text>
+                </TouchableOpacity>
+              </View>
 
               <TouchableOpacity style={styles.uploadClothBtn} onPress={pickClothingPhoto} activeOpacity={0.85}>
-                <GlassCard style={styles.uploadClothBtnInner}>
-                  <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.uploadClothIcon}>
-                    <Ionicons name="cloud-upload" size={20} color="#fff" />
+                <LinearGradient colors={['rgba(124,58,237,0.15)', 'rgba(236,72,153,0.1)']} style={styles.uploadClothInner}>
+                  <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.uploadClothIcon}>
+                    <Ionicons name="cloud-upload" size={18} color="#fff" />
                   </LinearGradient>
-                  <Text style={styles.uploadClothText}>Upload Clothing Image</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.uploadClothTitle}>Upload Clothing Image</Text>
+                    <Text style={styles.uploadClothSub}>From your gallery or camera roll</Text>
+                  </View>
                   <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />
-                </GlassCard>
+                </LinearGradient>
               </TouchableOpacity>
 
-              <Text style={styles.catalogTitle}>✨ Featured Catalog</Text>
-              <View style={styles.catalogGrid}>
-                {CLOTHING_CATALOG.map((item) => (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={[styles.catalogItem, selectedClothingId === item.id && styles.catalogItemSelected]}
-                    onPress={() => selectCatalogItem(item)}
-                    activeOpacity={0.85}
-                  >
-                    <Image source={{ uri: item.image }} style={styles.catalogImage} />
-                    <LinearGradient
-                      colors={['transparent', 'rgba(0,0,0,0.8)']}
-                      style={styles.catalogOverlay}
+              <Text style={styles.catalogLabel}>Featured Catalog</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catFilterScroll}>
+                <View style={styles.catFilterRow}>
+                  {CATEGORIES_FILTER.map((cat) => (
+                    <TouchableOpacity
+                      key={cat}
+                      style={[styles.catChip, catFilter === cat && styles.catChipActive]}
+                      onPress={() => setCatFilter(cat)}
                     >
-                      <Text style={styles.catalogName}>{item.name}</Text>
-                      <Text style={styles.catalogPrice}>{item.price}</Text>
-                    </LinearGradient>
-                    {selectedClothingId === item.id && (
-                      <View style={styles.catalogSelectedBadge}>
-                        <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
+                      <Text style={[styles.catChipText, catFilter === cat && styles.catChipTextActive]}>{cat}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+
+              <View style={styles.catalogGrid}>
+                {filteredCatalog.map((item) => {
+                  const selected = selectedClothingId === item.id;
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={[styles.catalogItem, selected && styles.catalogItemSelected]}
+                      onPress={() => { setSelectedClothing(item.image); setSelectedClothingId(item.id); }}
+                      activeOpacity={0.85}
+                    >
+                      <Image source={{ uri: item.image }} style={styles.catalogImg} />
+                      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.85)']} style={styles.catalogOverlay}>
+                        <Text style={styles.catalogName}>{item.name}</Text>
+                        <Text style={styles.catalogPrice}>{item.price}</Text>
+                      </LinearGradient>
+                      {selected && (
+                        <View style={styles.catalogCheck}>
+                          <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.catalogCheckGrad}>
+                            <Ionicons name="checkmark" size={16} color="#fff" />
+                          </LinearGradient>
+                        </View>
+                      )}
+                      <View style={styles.catalogCategoryBadge}>
+                        <Text style={styles.catalogCategoryText}>{item.category}</Text>
                       </View>
-                    )}
-                  </TouchableOpacity>
-                ))}
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
 
-              {selectedClothingId && (
-                <GradientButton
-                  title="Continue to Settings"
-                  onPress={() => setStep('settings')}
-                  style={{ marginTop: 16 }}
-                  icon={<Ionicons name="settings-outline" size={18} color="#fff" />}
-                />
-              )}
-            </View>
-          )}
-
-          {step === 'settings' && (
-            <View style={styles.section}>
-              <View style={styles.previewRow}>
-                {userPhoto && (
-                  <View style={styles.previewItem}>
-                    <Image source={{ uri: userPhoto }} style={styles.previewImg} />
-                    <Text style={styles.previewLabel}>Your Photo</Text>
-                  </View>
-                )}
-                <View style={styles.previewArrow}>
-                  <Ionicons name="add" size={24} color={Colors.primary} />
-                </View>
-                {selectedClothing && (
-                  <View style={styles.previewItem}>
-                    <Image source={{ uri: selectedClothing }} style={styles.previewImg} />
-                    <Text style={styles.previewLabel}>Clothing</Text>
-                  </View>
-                )}
-                <View style={styles.previewArrow}>
-                  <Ionicons name="arrow-forward" size={20} color={Colors.textSecondary} />
-                </View>
-                <View style={[styles.previewItem, styles.previewResult]}>
-                  <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.previewResultGrad}>
-                    <Ionicons name="sparkles" size={28} color="#fff" />
+              {selectedClothing && (
+                <TouchableOpacity style={styles.generateBtn} onPress={startTryOn} activeOpacity={0.9}>
+                  <LinearGradient colors={['#7c3aed', '#ec4899']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.generateBtnGrad}>
+                    <Ionicons name="sparkles" size={20} color="#fff" />
+                    <Text style={styles.generateBtnText}>Generate AI Try-On</Text>
+                    <Ionicons name="arrow-forward" size={18} color="rgba(255,255,255,0.8)" />
                   </LinearGradient>
-                  <Text style={styles.previewLabel}>AI Result</Text>
-                </View>
-              </View>
-
-              <Text style={styles.settingsSection}>Style Mode</Text>
-              <View style={styles.optionsRow}>
-                {STYLE_OPTIONS.map((opt) => (
-                  <TouchableOpacity
-                    key={opt.id}
-                    style={[styles.optionChip, selectedStyle === opt.id && styles.optionChipActive]}
-                    onPress={() => setSelectedStyle(opt.id)}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.optionEmoji}>{opt.icon}</Text>
-                    <Text style={[styles.optionLabel, selectedStyle === opt.id && { color: Colors.primaryLight }]}>
-                      {opt.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <Text style={styles.settingsSection}>Background</Text>
-              <View style={styles.optionsRow}>
-                {BG_OPTIONS.map((opt) => (
-                  <TouchableOpacity
-                    key={opt.id}
-                    style={[styles.optionChip, backgroundStyle === opt.id && styles.optionChipActive]}
-                    onPress={() => setBackgroundStyle(opt.id)}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.optionEmoji}>{opt.icon}</Text>
-                    <Text style={[styles.optionLabel, backgroundStyle === opt.id && { color: Colors.primaryLight }]}>
-                      {opt.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <GlassCard style={styles.featuresCard}>
-                <Text style={styles.featuresTitle}>AI Features Enabled</Text>
-                {[
-                  { icon: 'body-outline', label: 'Body shape preservation' },
-                  { icon: 'person-outline', label: 'Face & skin tone matching' },
-                  { icon: 'layers-outline', label: 'Fabric texture & shadows' },
-                  { icon: 'sunny-outline', label: 'Cinematic lighting' },
-                  { icon: 'resize-outline', label: 'Proper fit & proportions' },
-                ].map((f, i) => (
-                  <View key={i} style={styles.featureRow}>
-                    <Ionicons name={f.icon as any} size={16} color={Colors.primary} />
-                    <Text style={styles.featureText}>{f.label}</Text>
-                    <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
-                  </View>
-                ))}
-              </GlassCard>
-
-              <GradientButton
-                title="Generate AI Try-On ✨"
-                onPress={startTryOn}
-                size="lg"
-                style={{ marginTop: 20 }}
-              />
-
-              <TouchableOpacity style={styles.backBtn} onPress={() => setStep('clothing')}>
-                <Text style={styles.backBtnText}>← Back to Clothing Selection</Text>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </ScrollView>
@@ -492,164 +388,145 @@ export default function TryOnScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1, backgroundColor: '#0a0a0f' },
   safeArea: { flex: 1 },
-  bgGrad: { position: 'absolute', top: 0, left: 0, right: 0, height: 400 },
-  header: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 },
-  headerTitle: { color: Colors.text, fontSize: 24, fontWeight: '800', letterSpacing: -0.5 },
-  headerSub: { color: Colors.textSecondary, fontSize: 13, marginTop: 2 },
-  stepIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+  bgGrad: { position: 'absolute', top: 0, left: 0, right: 0, height: 350 },
+  header: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingTop: 12, paddingBottom: 10,
   },
-  stepItem: { alignItems: 'center', gap: 4 },
+  headerTitle: { color: '#f8fafc', fontSize: 22, fontWeight: '800' },
+  headerSub: { color: '#64748b', fontSize: 12, marginTop: 2 },
+  arBtn: { borderRadius: 20, overflow: 'hidden' },
+  arBtnGrad: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 14, paddingVertical: 8 },
+  arBtnText: { color: '#fff', fontSize: 12, fontWeight: '800' },
+  stepBar: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 24, paddingVertical: 14,
+  },
+  stepItem: { alignItems: 'center', gap: 5 },
   stepCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 30, height: 30, borderRadius: 15,
+    backgroundColor: '#1a1a28', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center', justifyContent: 'center',
   },
-  stepCircleActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  stepCircleDone: { backgroundColor: Colors.success, borderColor: Colors.success },
-  stepNum: { color: Colors.textMuted, fontSize: 12, fontWeight: '700' },
-  stepLabel: { color: Colors.textMuted, fontSize: 11, fontWeight: '600' },
-  stepLine: { flex: 1, height: 1, backgroundColor: Colors.border, marginBottom: 16 },
-  stepLineDone: { backgroundColor: Colors.success },
-  scrollContent: { paddingBottom: 120 },
-  section: { paddingHorizontal: 20 },
-  sectionTitle: { color: Colors.text, fontSize: 20, fontWeight: '700', marginBottom: 4 },
-  sectionSub: { color: Colors.textSecondary, fontSize: 13, marginBottom: 20 },
-  uploadArea: { borderRadius: 20, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(139,92,246,0.3)', borderStyle: 'dashed' },
-  uploadGrad: { padding: 40, alignItems: 'center' },
-  uploadIcon: { marginBottom: 16 },
-  uploadIconGrad: { width: 72, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center' },
-  uploadTitle: { color: Colors.text, fontSize: 18, fontWeight: '700', marginBottom: 6 },
-  uploadSub: { color: Colors.textSecondary, fontSize: 13, marginBottom: 20 },
-  uploadTips: { flexDirection: 'row', gap: 16 },
+  stepCircleActive: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
+  stepCircleDone: { backgroundColor: '#10b981', borderColor: '#10b981' },
+  stepNum: { color: '#475569', fontSize: 12, fontWeight: '700' },
+  stepLabel: { color: '#475569', fontSize: 10, fontWeight: '600' },
+  stepLine: { flex: 1, height: 1.5, backgroundColor: 'rgba(255,255,255,0.08)', marginBottom: 18 },
+  stepLineDone: { backgroundColor: '#10b981' },
+  scroll: { paddingBottom: 120 },
+  section: { paddingHorizontal: 16 },
+  uploadBox: {
+    borderRadius: 24, overflow: 'hidden',
+    borderWidth: 1.5, borderColor: 'rgba(124,58,237,0.35)',
+    borderStyle: 'dashed', marginBottom: 16,
+  },
+  uploadBoxInner: { padding: 36, alignItems: 'center' },
+  uploadIcon: { width: 72, height: 72, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  uploadTitle: { color: '#f8fafc', fontSize: 20, fontWeight: '800', marginBottom: 6 },
+  uploadSub: { color: '#64748b', fontSize: 13, textAlign: 'center', marginBottom: 20, lineHeight: 18 },
+  uploadTips: { flexDirection: 'row', gap: 14, marginBottom: 24 },
   uploadTip: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  uploadTipText: { color: Colors.textSecondary, fontSize: 12 },
-  cameraBtn: { marginTop: 14 },
-  cameraBtnInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    gap: 12,
+  uploadTipText: { color: '#94a3b8', fontSize: 11 },
+  uploadBtn: {
+    backgroundColor: 'rgba(124,58,237,0.2)', borderRadius: 14,
+    paddingHorizontal: 28, paddingVertical: 12,
+    borderWidth: 1, borderColor: 'rgba(124,58,237,0.4)',
   },
-  cameraBtnText: { flex: 1, color: Colors.text, fontSize: 16, fontWeight: '700' },
-  cameraBtnSub: { color: Colors.textMuted, fontSize: 11, position: 'absolute', bottom: 16, left: 60 },
-  liveChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(239,68,68,0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+  uploadBtnText: { color: '#a78bfa', fontWeight: '700', fontSize: 14 },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
+  divider: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.06)' },
+  dividerText: { color: '#475569', fontSize: 12, fontWeight: '600' },
+  liveArCard: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: '#16161f', borderRadius: 18, padding: 16,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: 28,
   },
-  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.error },
-  liveText: { color: Colors.error, fontSize: 10, fontWeight: '800' },
-  userPhotoPreview: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: 14,
-    padding: 12,
-    marginBottom: 20,
+  liveArLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  liveArIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  liveArTitle: { color: '#f8fafc', fontWeight: '700', fontSize: 15 },
+  liveArSub: { color: '#64748b', fontSize: 12, marginTop: 2 },
+  liveBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(239,68,68,0.15)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 },
+  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#ef4444' },
+  liveText: { color: '#ef4444', fontSize: 10, fontWeight: '800' },
+  clothingTypesSection: { marginBottom: 20 },
+  clothingTypesTitle: { color: '#f8fafc', fontSize: 16, fontWeight: '700', marginBottom: 14 },
+  clothingTypeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  clothingTypeItem: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: '#16161f', borderRadius: 12,
+    paddingHorizontal: 12, paddingVertical: 8,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    minWidth: (width - 60) / 2 - 4,
   },
-  userPhotoSmall: { width: 48, height: 64, borderRadius: 10, resizeMode: 'cover' },
-  userPhotoLabel: { color: Colors.text, fontWeight: '600' },
-  changePhotoBtn: { color: Colors.primary, fontSize: 12, marginTop: 2 },
-  uploadClothBtn: { marginBottom: 20 },
-  uploadClothBtnInner: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
-  uploadClothIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  uploadClothText: { flex: 1, color: Colors.text, fontWeight: '600' },
-  catalogTitle: { color: Colors.text, fontSize: 16, fontWeight: '700', marginBottom: 12 },
-  catalogGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  clothingTypeEmoji: { fontSize: 16 },
+  clothingTypeLabel: { color: '#94a3b8', fontSize: 12, fontWeight: '600' },
+  photoPreviewBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    backgroundColor: '#16161f', borderRadius: 16, padding: 12,
+    marginBottom: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+  },
+  photoThumb: { width: 52, height: 68, borderRadius: 10 },
+  photoPreviewLabel: { color: '#f8fafc', fontWeight: '700', fontSize: 14 },
+  photoPreviewSub: { color: '#64748b', fontSize: 12, marginTop: 2 },
+  changeBtn: { color: '#a78bfa', fontSize: 13, fontWeight: '600' },
+  uploadClothBtn: { borderRadius: 16, overflow: 'hidden', marginBottom: 20 },
+  uploadClothInner: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
+  uploadClothIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  uploadClothTitle: { color: '#f8fafc', fontWeight: '700', fontSize: 14 },
+  uploadClothSub: { color: '#64748b', fontSize: 12, marginTop: 2 },
+  catalogLabel: { color: '#f8fafc', fontSize: 16, fontWeight: '700', marginBottom: 10 },
+  catFilterScroll: { marginBottom: 12 },
+  catFilterRow: { flexDirection: 'row', gap: 8, paddingBottom: 4 },
+  catChip: {
+    paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
+    backgroundColor: '#16161f', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+  },
+  catChipActive: { backgroundColor: 'rgba(124,58,237,0.2)', borderColor: '#7c3aed' },
+  catChipText: { color: '#64748b', fontSize: 12, fontWeight: '600' },
+  catChipTextActive: { color: '#a78bfa' },
+  catalogGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 20 },
   catalogItem: {
-    width: (width - 52) / 2,
-    height: 180,
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    width: (width - 42) / 2, borderRadius: 16, overflow: 'hidden',
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.06)',
+    position: 'relative',
   },
-  catalogItemSelected: { borderColor: Colors.primary },
-  catalogImage: { width: '100%', height: '100%', resizeMode: 'cover' },
-  catalogOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 10,
-  },
+  catalogItemSelected: { borderColor: '#7c3aed', borderWidth: 2 },
+  catalogImg: { width: '100%', height: 180 },
+  catalogOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 10, paddingTop: 20 },
   catalogName: { color: '#fff', fontSize: 12, fontWeight: '700' },
-  catalogPrice: { color: 'rgba(255,255,255,0.7)', fontSize: 11 },
-  catalogSelectedBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: Colors.background,
-    borderRadius: 12,
+  catalogPrice: { color: '#a78bfa', fontSize: 11, fontWeight: '600', marginTop: 2 },
+  catalogCheck: { position: 'absolute', top: 8, right: 8, borderRadius: 12, overflow: 'hidden' },
+  catalogCheckGrad: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
+  catalogCategoryBadge: {
+    position: 'absolute', top: 8, left: 8,
+    backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 7, paddingVertical: 3, borderRadius: 8,
   },
-  settingsSection: { color: Colors.text, fontSize: 16, fontWeight: '700', marginBottom: 12, marginTop: 20 },
-  optionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  optionChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: Colors.border,
+  catalogCategoryText: { color: '#fff', fontSize: 9, fontWeight: '700' },
+  generateBtn: { borderRadius: 18, overflow: 'hidden', marginBottom: 24 },
+  generateBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingVertical: 18 },
+  generateBtnText: { color: '#fff', fontSize: 17, fontWeight: '800', flex: 1, textAlign: 'center' },
+  processingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
+  processingOrb: { position: 'relative', marginBottom: 36, alignItems: 'center', justifyContent: 'center' },
+  orbInner: { width: 100, height: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center' },
+  orbRing1: { position: 'absolute', width: 128, height: 128, borderRadius: 64, borderWidth: 1, borderColor: 'rgba(124,58,237,0.3)' },
+  orbRing2: { position: 'absolute', width: 160, height: 160, borderRadius: 80, borderWidth: 1, borderColor: 'rgba(124,58,237,0.15)' },
+  processingTitle: { color: '#f8fafc', fontSize: 24, fontWeight: '800', textAlign: 'center', marginBottom: 10 },
+  processingMsg: { color: '#94a3b8', fontSize: 14, textAlign: 'center', marginBottom: 32 },
+  progressWrap: { width: '100%', marginBottom: 36 },
+  progressBg: { height: 8, backgroundColor: '#1a1a28', borderRadius: 4, overflow: 'hidden', marginBottom: 8 },
+  progressFill: { height: '100%', borderRadius: 4 },
+  progressPct: { color: '#a78bfa', fontSize: 14, fontWeight: '700', textAlign: 'right' },
+  processingSteps: { gap: 14, width: '100%' },
+  pStep: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  pStepDot: {
+    width: 26, height: 26, borderRadius: 13, backgroundColor: '#1a1a28',
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center', justifyContent: 'center',
   },
-  optionChipActive: { borderColor: Colors.primary, backgroundColor: 'rgba(139,92,246,0.12)' },
-  optionEmoji: { fontSize: 16 },
-  optionLabel: { color: Colors.textSecondary, fontSize: 13, fontWeight: '600' },
-  previewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginBottom: 24,
-    marginTop: 8,
-  },
-  previewItem: { alignItems: 'center', gap: 6 },
-  previewImg: { width: 70, height: 90, borderRadius: 12, resizeMode: 'cover' },
-  previewResult: {},
-  previewResultGrad: { width: 70, height: 90, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  previewArrow: { alignItems: 'center', marginBottom: 20 },
-  previewLabel: { color: Colors.textSecondary, fontSize: 10, fontWeight: '600' },
-  featuresCard: { padding: 16, marginTop: 20 },
-  featuresTitle: { color: Colors.text, fontWeight: '700', marginBottom: 12 },
-  featureRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
-  featureText: { flex: 1, color: Colors.textSecondary, fontSize: 13 },
-  backBtn: { alignItems: 'center', padding: 16 },
-  backBtnText: { color: Colors.textSecondary, fontSize: 14 },
-  processingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-  },
-  processingOrb: { marginBottom: 32 },
-  orbGrad: { width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center' },
-  processingTitle: { color: Colors.text, fontSize: 26, fontWeight: '800', marginBottom: 8, textAlign: 'center' },
-  processingMsg: { color: Colors.textSecondary, fontSize: 15, textAlign: 'center', marginBottom: 32 },
-  progressBarContainer: { width: '100%', alignItems: 'center', gap: 10 },
-  progressBarBg: { width: '100%', height: 8, backgroundColor: Colors.surfaceElevated, borderRadius: 4, overflow: 'hidden' },
-  progressBarFill: { height: '100%', borderRadius: 4 },
-  progressPct: { color: Colors.primaryLight, fontSize: 14, fontWeight: '700' },
-  processingSteps: { gap: 14, marginTop: 28, width: '100%' },
-  processingStep: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  processingStepDone: {},
-  processingStepText: { color: Colors.textMuted, fontSize: 14 },
+  pStepDotDone: { backgroundColor: '#10b981', borderColor: '#10b981' },
+  pStepInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#475569' },
+  pStepText: { color: '#64748b', fontSize: 14, fontWeight: '600' },
 });
