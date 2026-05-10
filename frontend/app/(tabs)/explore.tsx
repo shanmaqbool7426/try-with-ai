@@ -1,119 +1,47 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  TextInput,
-  Dimensions,
-  FlatList,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  Image, TextInput, Dimensions, FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
-import { GlassCard } from '@/components/GlassCard';
 
 const { width } = Dimensions.get('window');
-const CARD_W = (width - 40) / 2;
+const COL_W = (width - 36) / 2;
 
 const CATEGORIES = [
   { id: 'all', label: 'All', icon: '✨' },
   { id: 'women', label: 'Women', icon: '👗' },
   { id: 'men', label: 'Men', icon: '👔' },
+  { id: 'eastern', label: 'Eastern', icon: '🥻' },
+  { id: 'bridal', label: 'Bridal', icon: '👰' },
   { id: 'luxury', label: 'Luxury', icon: '💎' },
   { id: 'street', label: 'Street', icon: '🧢' },
-  { id: 'wedding', label: 'Wedding', icon: '💍' },
-  { id: 'sport', label: 'Sport', icon: '⚡' },
 ];
 
 const EXPLORE_ITEMS = [
-  {
-    id: '1',
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80',
-    likes: 4820,
-    category: 'women',
-    height: 220,
-    user: 'Sofia R.',
-    isAI: true,
-  },
-  {
-    id: '2',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80',
-    likes: 3240,
-    category: 'men',
-    height: 280,
-    user: 'James K.',
-    isAI: false,
-  },
-  {
-    id: '3',
-    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80',
-    likes: 6120,
-    category: 'luxury',
-    height: 260,
-    user: 'Mia C.',
-    isAI: true,
-  },
-  {
-    id: '4',
-    image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80',
-    likes: 2890,
-    category: 'women',
-    height: 200,
-    user: 'Zara N.',
-    isAI: true,
-  },
-  {
-    id: '5',
-    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=80',
-    likes: 1740,
-    category: 'street',
-    height: 240,
-    user: 'Ryan P.',
-    isAI: false,
-  },
-  {
-    id: '6',
-    image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&q=80',
-    likes: 8930,
-    category: 'wedding',
-    height: 300,
-    user: 'Laila M.',
-    isAI: true,
-  },
-  {
-    id: '7',
-    image: 'https://images.unsplash.com/photo-1495385794356-15371f348c31?w=400&q=80',
-    likes: 3560,
-    category: 'women',
-    height: 230,
-    user: 'Emma T.',
-    isAI: false,
-  },
-  {
-    id: '8',
-    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80',
-    likes: 2120,
-    category: 'street',
-    height: 190,
-    user: 'Kai S.',
-    isAI: true,
-  },
+  { id: '1', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80', likes: 4820, category: 'women', height: 240, user: 'Sofia R.', isAI: true },
+  { id: '2', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80', likes: 3240, category: 'men', height: 290, user: 'James K.', isAI: false },
+  { id: '3', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80', likes: 6120, category: 'luxury', height: 270, user: 'Mia C.', isAI: true },
+  { id: '4', image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80', likes: 2890, category: 'women', height: 210, user: 'Zara N.', isAI: true },
+  { id: '5', image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=80', likes: 1740, category: 'street', height: 250, user: 'Ryan P.', isAI: false },
+  { id: '6', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80', likes: 8930, category: 'bridal', height: 310, user: 'Laila M.', isAI: true },
+  { id: '7', image: 'https://images.unsplash.com/photo-1495385794356-15371f348c31?w=400&q=80', likes: 3560, category: 'women', height: 230, user: 'Emma T.', isAI: false },
+  { id: '8', image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80', likes: 2120, category: 'street', height: 200, user: 'Kai S.', isAI: true },
+  { id: '9', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80', likes: 5640, category: 'eastern', height: 260, user: 'Amara K.', isAI: true },
+  { id: '10', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', likes: 3100, category: 'men', height: 230, user: 'Omar H.', isAI: false },
 ];
 
-const FEATURED_CREATORS = [
-  { id: '1', name: 'Sofia Reyes', followers: '48.2K', avatar: 'https://i.pravatar.cc/150?img=5', specialty: 'Luxury Fashion' },
-  { id: '2', name: 'Mia Chen', followers: '32.1K', avatar: 'https://i.pravatar.cc/150?img=9', specialty: 'Bridal Looks' },
-  { id: '3', name: 'Zara Nguyen', followers: '28.7K', avatar: 'https://i.pravatar.cc/150?img=25', specialty: 'Streetwear' },
-  { id: '4', name: 'James Kim', followers: '19.4K', avatar: 'https://i.pravatar.cc/150?img=12', specialty: 'Menswear' },
+const CREATORS = [
+  { id: '1', name: 'Sofia Reyes', followers: '48.2K', avatar: 'https://i.pravatar.cc/150?img=5', specialty: 'Luxury', verified: true },
+  { id: '2', name: 'Mia Chen', followers: '32.1K', avatar: 'https://i.pravatar.cc/150?img=9', specialty: 'Bridal', verified: true },
+  { id: '3', name: 'Zara Nguyen', followers: '28.7K', avatar: 'https://i.pravatar.cc/150?img=25', specialty: 'Streetwear', verified: false },
+  { id: '4', name: 'James Kim', followers: '19.4K', avatar: 'https://i.pravatar.cc/150?img=12', specialty: 'Menswear', verified: true },
 ];
 
 function formatNum(n: number) {
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
-  return n.toString();
+  return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n.toString();
 }
 
 export default function ExploreScreen() {
@@ -121,10 +49,9 @@ export default function ExploreScreen() {
   const [searchText, setSearchText] = useState('');
   const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
 
-  const filtered = EXPLORE_ITEMS.filter((item) => {
-    if (activeCategory !== 'all' && item.category !== activeCategory) return false;
-    return true;
-  });
+  const filtered = EXPLORE_ITEMS.filter((item) =>
+    (activeCategory === 'all' || item.category === activeCategory)
+  );
 
   const leftCol = filtered.filter((_, i) => i % 2 === 0);
   const rightCol = filtered.filter((_, i) => i % 2 !== 0);
@@ -132,83 +59,75 @@ export default function ExploreScreen() {
   const toggleLike = (id: string) => {
     setLikedItems((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
   };
 
   const renderItem = (item: any) => (
-    <TouchableOpacity key={item.id} style={[styles.masonryItem, { height: item.height }]} activeOpacity={0.9}>
-      <Image source={{ uri: item.image }} style={styles.masonryImage} />
-      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.85)']} style={styles.masonryOverlay}>
+    <TouchableOpacity key={item.id} style={[styles.masonryItem, { height: item.height }]} activeOpacity={0.88}>
+      <Image source={{ uri: item.image }} style={styles.masonryImg} />
+      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.88)']} style={styles.masonryOverlay}>
         {item.isAI && (
           <View style={styles.aiChip}>
-            <Ionicons name="sparkles" size={10} color="#fff" />
+            <Ionicons name="sparkles" size={9} color="#fff" />
             <Text style={styles.aiChipText}>AI</Text>
           </View>
         )}
-        <Text style={styles.masonryUser}>{item.user}</Text>
-        <TouchableOpacity style={styles.likeBtn} onPress={() => toggleLike(item.id)}>
-          <Ionicons
-            name={likedItems.has(item.id) ? 'heart' : 'heart-outline'}
-            size={16}
-            color={likedItems.has(item.id) ? Colors.accent : '#fff'}
-          />
-          <Text style={styles.likeBtnText}>{formatNum(item.likes + (likedItems.has(item.id) ? 1 : 0))}</Text>
-        </TouchableOpacity>
+        <View style={styles.masonryBottom}>
+          <Text style={styles.masonryUser} numberOfLines={1}>{item.user}</Text>
+          <TouchableOpacity style={styles.likeBtn} onPress={() => toggleLike(item.id)}>
+            <Ionicons name={likedItems.has(item.id) ? 'heart' : 'heart-outline'} size={14} color={likedItems.has(item.id) ? '#ec4899' : '#fff'} />
+            <Text style={styles.likeBtnText}>{formatNum(item.likes + (likedItems.has(item.id) ? 1 : 0))}</Text>
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['rgba(6,182,212,0.08)', 'transparent']} style={styles.bgGrad} pointerEvents="none" />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Explore Fashion</Text>
+          <Text style={styles.headerTitle}>Explore</Text>
           <TouchableOpacity style={styles.filterBtn}>
-            <Ionicons name="options-outline" size={20} color={Colors.text} />
+            <Ionicons name="options-outline" size={20} color="#f8fafc" />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={18} color={Colors.textMuted} style={styles.searchIcon} />
+        <View style={styles.searchBar}>
+          <Ionicons name="search-outline" size={18} color="#475569" />
           <TextInput
             style={styles.searchInput}
             value={searchText}
             onChangeText={setSearchText}
-            placeholder="Search styles, trends, creators..."
-            placeholderTextColor={Colors.textMuted}
+            placeholder="Search styles, creators..."
+            placeholderTextColor="#475569"
           />
           {searchText.length > 0 && (
             <TouchableOpacity onPress={() => setSearchText('')}>
-              <Ionicons name="close-circle" size={18} color={Colors.textMuted} />
+              <Ionicons name="close-circle" size={17} color="#475569" />
             </TouchableOpacity>
           )}
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesScroll}
-        >
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catsRow}>
           {CATEGORIES.map((cat) => (
             <TouchableOpacity
               key={cat.id}
-              style={[styles.categoryChip, activeCategory === cat.id && styles.categoryChipActive]}
+              style={[styles.catChip, activeCategory === cat.id && styles.catChipActive]}
               onPress={() => setActiveCategory(cat.id)}
               activeOpacity={0.8}
             >
               {activeCategory === cat.id ? (
-                <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.categoryGrad}>
-                  <Text style={styles.categoryEmoji}>{cat.icon}</Text>
-                  <Text style={styles.categoryLabelActive}>{cat.label}</Text>
+                <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.catChipGrad}>
+                  <Text style={styles.catEmojiActive}>{cat.icon}</Text>
+                  <Text style={styles.catLabelActive}>{cat.label}</Text>
                 </LinearGradient>
               ) : (
                 <>
-                  <Text style={styles.categoryEmoji}>{cat.icon}</Text>
-                  <Text style={styles.categoryLabel}>{cat.label}</Text>
+                  <Text style={styles.catEmoji}>{cat.icon}</Text>
+                  <Text style={styles.catLabel}>{cat.label}</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -216,36 +135,47 @@ export default function ExploreScreen() {
         </ScrollView>
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          <View style={styles.featuredSection}>
-            <Text style={styles.sectionLabel}>⭐ Top Creators</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {FEATURED_CREATORS.map((creator) => (
-                <TouchableOpacity key={creator.id} style={styles.creatorCard} activeOpacity={0.85}>
-                  <GlassCard style={styles.creatorCardInner}>
-                    <Image source={{ uri: creator.avatar }} style={styles.creatorAvatar} />
-                    <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.creatorRing} />
-                    <Text style={styles.creatorName}>{creator.name}</Text>
-                    <Text style={styles.creatorSpecialty}>{creator.specialty}</Text>
-                    <Text style={styles.creatorFollowers}>{creator.followers} followers</Text>
-                    <TouchableOpacity style={styles.followBtn}>
-                      <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.followBtnGrad}>
-                        <Text style={styles.followBtnText}>Follow</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  </GlassCard>
+          <Text style={styles.sectionLabel}>Top Creators</Text>
+          <FlatList
+            data={CREATORS}
+            keyExtractor={(c) => c.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.creatorsRow}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.creatorCard} activeOpacity={0.85}>
+                <View style={styles.creatorAvatarWrap}>
+                  <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.creatorRing}>
+                    <Image source={{ uri: item.avatar }} style={styles.creatorAvatar} />
+                  </LinearGradient>
+                  {item.verified && (
+                    <View style={styles.verifiedBadge}>
+                      <Ionicons name="checkmark" size={9} color="#fff" />
+                    </View>
+                  )}
+                </View>
+                <Text style={styles.creatorName} numberOfLines={1}>{item.name}</Text>
+                <Text style={styles.creatorSpecialty}>{item.specialty}</Text>
+                <Text style={styles.creatorFollowers}>{item.followers}</Text>
+                <TouchableOpacity style={styles.followBtn}>
+                  <LinearGradient colors={['#7c3aed', '#ec4899']} style={styles.followBtnGrad}>
+                    <Text style={styles.followBtnText}>Follow</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
+              </TouchableOpacity>
+            )}
+          />
+
+          <View style={styles.masonryHeader}>
+            <Text style={styles.sectionLabel}>
+              {activeCategory === 'all' ? 'Trending Now' : `${CATEGORIES.find(c => c.id === activeCategory)?.label} Looks`}
+            </Text>
+            <Text style={styles.countLabel}>{filtered.length} looks</Text>
           </View>
 
-          <View style={styles.masonrySection}>
-            <Text style={styles.sectionLabel}>
-              🔥 Trending {activeCategory !== 'all' ? CATEGORIES.find(c => c.id === activeCategory)?.label : 'Fashion'}
-            </Text>
-            <View style={styles.masonryContainer}>
-              <View style={styles.masonryCol}>{leftCol.map(renderItem)}</View>
-              <View style={styles.masonryCol}>{rightCol.map(renderItem)}</View>
-            </View>
+          <View style={styles.masonryCols}>
+            <View style={styles.masonryCol}>{leftCol.map(renderItem)}</View>
+            <View style={styles.masonryCol}>{rightCol.map(renderItem)}</View>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -254,109 +184,69 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1, backgroundColor: '#0a0a0f' },
   safeArea: { flex: 1 },
-  bgGrad: { position: 'absolute', top: 0, left: 0, right: 0, height: 300 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 12,
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingTop: 10, paddingBottom: 12 },
+  headerTitle: { color: '#f8fafc', fontSize: 24, fontWeight: '800' },
+  filterBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#16161f', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)' },
+  searchBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    marginHorizontal: 16, backgroundColor: '#16161f',
+    borderRadius: 14, paddingHorizontal: 14, paddingVertical: 11,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', marginBottom: 14,
   },
-  headerTitle: { color: Colors.text, fontSize: 24, fontWeight: '800' },
-  filterBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: Colors.surfaceElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    marginBottom: 14,
-  },
-  searchIcon: { marginRight: 8 },
-  searchInput: { flex: 1, color: Colors.text, fontSize: 14, paddingVertical: 12 },
-  categoriesScroll: { paddingHorizontal: 16, gap: 8, paddingBottom: 16 },
-  categoryChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: Colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: Colors.border,
+  searchInput: { flex: 1, color: '#f8fafc', fontSize: 14 },
+  catsRow: { paddingHorizontal: 16, gap: 8, paddingBottom: 14 },
+  catChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
+    backgroundColor: '#16161f', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
     overflow: 'hidden',
   },
-  categoryChipActive: { backgroundColor: 'transparent', borderColor: 'transparent', padding: 0 },
-  categoryGrad: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
-  categoryEmoji: { fontSize: 14 },
-  categoryLabel: { color: Colors.textSecondary, fontSize: 13, fontWeight: '600' },
-  categoryLabelActive: { color: '#fff', fontSize: 13, fontWeight: '700' },
-  scrollContent: { paddingBottom: 100 },
-  featuredSection: { marginBottom: 20 },
-  sectionLabel: { color: Colors.text, fontSize: 16, fontWeight: '700', paddingHorizontal: 16, marginBottom: 12 },
-  creatorCard: { marginLeft: 16, width: 140 },
-  creatorCardInner: { padding: 14, alignItems: 'center' },
-  creatorAvatar: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: Colors.primary },
-  creatorRing: {
-    position: 'absolute',
-    top: 12,
-    left: '50%',
-    marginLeft: -30,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    opacity: 0.2,
+  catChipActive: { backgroundColor: 'transparent', borderColor: 'transparent', padding: 0 },
+  catChipGrad: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
+  catEmoji: { fontSize: 14 },
+  catEmojiActive: { fontSize: 14 },
+  catLabel: { color: '#64748b', fontSize: 13, fontWeight: '600' },
+  catLabelActive: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  scrollContent: { paddingBottom: 110 },
+  sectionLabel: { color: '#f8fafc', fontSize: 16, fontWeight: '700', paddingHorizontal: 16, marginBottom: 12 },
+  creatorsRow: { paddingHorizontal: 16, gap: 12, paddingBottom: 4 },
+  creatorCard: {
+    width: 130, backgroundColor: '#12121a', borderRadius: 18,
+    padding: 14, alignItems: 'center',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  creatorName: { color: Colors.text, fontWeight: '700', fontSize: 13, marginTop: 8, textAlign: 'center' },
-  creatorSpecialty: { color: Colors.textMuted, fontSize: 11, marginTop: 2, textAlign: 'center' },
-  creatorFollowers: { color: Colors.primary, fontSize: 12, fontWeight: '600', marginTop: 4 },
-  followBtn: { marginTop: 10, borderRadius: 20, overflow: 'hidden', width: '100%' },
-  followBtnGrad: { paddingVertical: 6, alignItems: 'center' },
+  creatorAvatarWrap: { position: 'relative', marginBottom: 8 },
+  creatorRing: { width: 60, height: 60, borderRadius: 30, padding: 2, alignItems: 'center', justifyContent: 'center' },
+  creatorAvatar: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: '#0a0a0f' },
+  verifiedBadge: {
+    position: 'absolute', bottom: 0, right: 0,
+    width: 18, height: 18, borderRadius: 9,
+    backgroundColor: '#7c3aed', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, borderColor: '#0a0a0f',
+  },
+  creatorName: { color: '#f8fafc', fontWeight: '700', fontSize: 13, textAlign: 'center' },
+  creatorSpecialty: { color: '#475569', fontSize: 11, marginTop: 2 },
+  creatorFollowers: { color: '#7c3aed', fontSize: 12, fontWeight: '600', marginTop: 4, marginBottom: 10 },
+  followBtn: { width: '100%', borderRadius: 12, overflow: 'hidden' },
+  followBtnGrad: { paddingVertical: 7, alignItems: 'center' },
   followBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
-  masonrySection: {},
-  masonryContainer: { flexDirection: 'row', paddingHorizontal: 12, gap: 8 },
+  masonryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 20, marginBottom: 12 },
+  countLabel: { color: '#475569', fontSize: 13 },
+  masonryCols: { flexDirection: 'row', paddingHorizontal: 10, gap: 8 },
   masonryCol: { flex: 1, gap: 8 },
   masonryItem: { borderRadius: 16, overflow: 'hidden', position: 'relative' },
-  masonryImage: { width: '100%', height: '100%', resizeMode: 'cover' },
-  masonryOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
+  masonryImg: { width: '100%', height: '100%' },
+  masonryOverlay: { position: 'absolute', inset: 0, justifyContent: 'flex-end', padding: 10 },
   aiChip: {
-    position: 'absolute',
-    top: -60,
-    left: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    backgroundColor: 'rgba(139,92,246,0.8)',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 8,
+    position: 'absolute', top: 8, left: 8,
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+    backgroundColor: 'rgba(124,58,237,0.85)', paddingHorizontal: 7, paddingVertical: 3, borderRadius: 8,
   },
-  aiChipText: { color: '#fff', fontSize: 10, fontWeight: '800' },
+  aiChipText: { color: '#fff', fontSize: 9, fontWeight: '800' },
+  masonryBottom: { flexDirection: 'row', alignItems: 'center' },
   masonryUser: { flex: 1, color: '#fff', fontSize: 11, fontWeight: '600' },
   likeBtn: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  likeBtnText: { color: '#fff', fontSize: 11, fontWeight: '600' },
+  likeBtnText: { color: '#fff', fontSize: 11 },
 });
